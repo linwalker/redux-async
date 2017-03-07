@@ -3,26 +3,28 @@
  */
 import React,{Component} from 'react';
 import {connect} from 'react-redux';
-import {selectReddit,fetchPosts} from '../actions/index';
+import {bindActionCreators} from 'redux';
+import * as actions from '../actions/index';
 import Picker from '../components/Picker';
 import Posts from '../components/Posts';
 class App extends Component {
 
     componentDidMount() {
-        const {dispatch,selectedReddit} = this.props;
-        dispatch(fetchPosts(selectedReddit))
+        const {selectedReddit} = this.props;
+        this.props.actions.fetchPosts(selectedReddit)
     }
 
     handleChange (reddit) {
-        this.props.dispatch(selectReddit(reddit));
-        this.props.dispatch(fetchPosts(reddit));
+        this.props.actions.selectReddit(reddit)
+        this.props.actions.fetchPosts(reddit);
     }
 
     handleRefresh (e) {
         e.preventDefault();
-        const {dispatch,selectedReddit} = this.props;
-        dispatch(fetchPosts(selectedReddit));
+        const {selectedReddit} = this.props;
+        this.props.actions.fetchPosts(selectedReddit)
     }
+
     render() {
         const {selectedReddit,items,lastUpdated,isFetching} = this.props;
         const isEmpty = items.length === 0;
@@ -68,4 +70,13 @@ const mapStateToProps = state => {
         lastUpdated:receivePosts.lastUpdated
     }
 }
-export default connect(mapStateToProps)(App);
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        actions:bindActionCreators(actions,dispatch)
+    }
+}
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(App);
