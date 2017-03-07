@@ -4,7 +4,8 @@
 import {combineReducers} from 'redux';
 import {
     SELECT_REDDIT,
-    RECEIVE_POSTS
+    RECEIVE_POSTS,
+    REQUEST_POSTS
 } from '../constants/ActionTypes';
 
 const selectedReddit = (state = 'reactjs',action) => {
@@ -15,12 +16,22 @@ const selectedReddit = (state = 'reactjs',action) => {
     }
 }
 
-const receivePosts = (state = {items:[]},action) => {
+const receivePosts = (state = {
+    isFetching:false,
+    items:[]
+},action) => {
     switch(action.type) {
+        case REQUEST_POSTS:
+            return {
+                ...state,
+                isFetching:true
+            }
         case RECEIVE_POSTS:
             return {
                 ...state,
-                items:action.posts
+                isFetching:false,
+                items:action.posts,
+                lastUpdated:action.receiveTime
             }
         default:
             return state;

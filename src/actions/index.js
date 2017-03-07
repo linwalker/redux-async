@@ -3,7 +3,8 @@
  */
 import {
     SELECT_REDDIT,
-    RECEIVE_POSTS
+    RECEIVE_POSTS,
+    REQUEST_POSTS
 } from '../constants/ActionTypes';
 
 export const selectReddit = reddit => ({
@@ -12,6 +13,7 @@ export const selectReddit = reddit => ({
 })
 
 export const fetchPosts = reddit => dispatch => {
+    dispatch(requestPosts(reddit));
     return fetch(`https://www.reddit.com/r/${reddit}.json`)
         .then(response => response.json())
         .then(json => dispatch(receivePosts(reddit,json)))
@@ -22,4 +24,9 @@ const receivePosts = (reddit,json) => ({
     reddit,
     posts:json.data.children.map(child => child.data),
     receiveTime:Date.now()
+})
+
+const requestPosts = reddit => ({
+    type:REQUEST_POSTS,
+    reddit
 })

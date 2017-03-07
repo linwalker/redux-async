@@ -3,3 +3,4 @@
  */
 export const SELECT_REDDIT = "SELECT_REDDIT";
 export const RECEIVE_POSTS = "RECEIVE_POSTS";
+export const REQUEST_POSTS = "REQUEST_POSTS";

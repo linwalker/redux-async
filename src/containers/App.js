@@ -10,15 +10,22 @@ class App extends Component {
 
     componentDidMount() {
         const {dispatch,selectedReddit} = this.props;
-        console.log(selectedReddit);
         dispatch(fetchPosts(selectedReddit))
     }
+
     handleChange (reddit) {
         this.props.dispatch(selectReddit(reddit));
         this.props.dispatch(fetchPosts(reddit));
     }
+
+    handleRefresh (e) {
+        e.preventDefault();
+        const {dispatch,selectedReddit} = this.props;
+        dispatch(fetchPosts(selectedReddit));
+    }
     render() {
-        const {selectedReddit,items} = this.props;
+        const {selectedReddit,items,lastUpdated,isFetching} = this.props;
+        const isEmpty = items.length === 0;
         return(
             <div>
                 <Picker value={selectedReddit}
@@ -26,14 +33,27 @@ class App extends Component {
                         options={["reactjs","frontend"]}
                 />
                 <p>
-                    <span>Last updated at</span>
+                    {lastUpdated &&
+                        <span>
+                            Last updated at {new Date(lastUpdated).toLocaleTimeString()}.
+                            {' '}
+                        </span>
+                    }
                 </p>
-                <a href="#">
-                    Refresh
-                </a>
-                <div>
-                    <Posts posts={items}/>
-                </div>
+                {!isFetching &&
+                    <a href="#"
+                        onClick={this.handleRefresh.bind(this)}>
+                        Refresh
+                    </a>
+                }
+
+                {isEmpty ?
+                    (isFetching ? <h2>Loading</h2> : <h2>Empty</h2>)
+                    : <div style={{opacity:isFetching ? 0.5 : 1}}>
+                        <Posts posts={items} />
+                      </div>
+                }
+
             </div>
         )
     }
@@ -43,7 +63,9 @@ const mapStateToProps = state => {
     const {selectedReddit,receivePosts} = state;
     return {
         selectedReddit,
-        items:receivePosts.items
+        items:receivePosts.items,
+        isFetching:receivePosts.isFetching,
+        lastUpdated:receivePosts.lastUpdated
     }
 }
 export default connect(mapStateToProps)(App);
